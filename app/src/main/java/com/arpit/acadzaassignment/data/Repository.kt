@@ -7,7 +7,11 @@ interface Repository {
 
     suspend fun getPlaylists(query: String): List<Playlist>
 
-    suspend fun getVideos(playlistId: String): List<Video>
+    suspend fun getVideos(
+        playlistId: String,
+        playlistName: String,
+        playlistThumbnail: String
+    ): List<Video>
 
     suspend fun getSavedPlaylists(): List<Playlist>
 

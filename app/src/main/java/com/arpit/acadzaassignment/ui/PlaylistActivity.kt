@@ -28,12 +28,16 @@ class PlaylistActivity : YouTubeBaseActivity() {
     private var nextVideos = videos
     private var index = 0
     private var playlistId: String = ""
+    private var playlistName: String = ""
+    private var playlistThumbnail: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist)
 
         playlistId = intent.extras?.getString("playlistId")!!
+        playlistName = intent.extras?.getString("playlistName")!!
+        playlistThumbnail = intent.extras?.getString("playlistThumbnail")!!
 
         binding.videos.adapter = VideoAdapter()
         loadVideos()
@@ -124,7 +128,7 @@ class PlaylistActivity : YouTubeBaseActivity() {
 
         CoroutineScope(Dispatchers.Main + job).launch {
             withContext(Dispatchers.IO) {
-                videos = app.repository.getVideos(playlistId)
+                videos = app.repository.getVideos(playlistId, playlistName, playlistThumbnail)
                 cacheVideos()
             }
         }

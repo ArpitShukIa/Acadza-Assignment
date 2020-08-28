@@ -21,53 +21,43 @@ class DefaultRepository(private val application: Application) : Repository {
         return jsonParseQuery(url)
     }
 
-    override suspend fun getVideos(playlistId: String): List<Video> {
+    override suspend fun getVideos(
+        playlistId: String,
+        playlistName: String,
+        playlistThumbnail: String
+    ): List<Video> {
         requestQueue = Volley.newRequestQueue(application)
-        return jsonParseVideos(playlistId)
+        return jsonParseVideos(playlistId, playlistName, playlistThumbnail)
     }
 
     override suspend fun getSavedPlaylists(): List<Playlist> {
         val videos = application.playlistDao.getAllVideos()
-        playlistsHashMap = HashMap()
+        val playlistsHashMap = HashMap<String, MutableList<Video>>()
         for (video in videos) {
             if (playlistsHashMap.containsKey(video.playlistId))
                 playlistsHashMap[video.playlistId]?.add(video)
             else
                 playlistsHashMap[video.playlistId] = mutableListOf(video)
         }
-        val playlistIds = playlistsHashMap.keys.joinToString()
-        val url = playlistsUrlFormat.format(playlistIds)
-        requestQueue = Volley.newRequestQueue(application)
-        return jsonParsePlaylists(url)
-    }
-
-    private fun jsonParsePlaylists(url: String): List<Playlist> {
         val playlists = mutableListOf<Playlist>()
-        val future = RequestFuture.newFuture<JSONObject>()
-        val request = JsonObjectRequest(url, null, future, future)
-        requestQueue.add(request)
-        try {
-            val response = future.get()
-            val items = response.getJSONArray("items")
-            for (i in 0 until items.length()) {
-                val data = items.getJSONObject(i)
-                val snippet = data.getJSONObject("snippet")
-                val thumbnail = snippet.getJSONObject("thumbnails").getJSONObject("high")
-
-                val id = data["id"].toString()
-                val title = snippet["title"].toString()
-                val channel = snippet["channelTitle"].toString()
-                val image = thumbnail["url"].toString()
-                val playlist = Playlist(id, image, title, channel, playlistsHashMap[id])
-                playlists.add(playlist)
-            }
-        } catch (e: Exception) {
-            Timber.tag(TAG).e(e)
+        for ((key, value) in playlistsHashMap) {
+            val playlist = Playlist(
+                key,
+                value[0].playlistThumbnail,
+                value[0].playlistName,
+                value[0].channel,
+                value
+            )
+            playlists.add(playlist)
         }
         return playlists
     }
 
-    private fun jsonParseVideos(playlistId: String): List<Video> {
+    private fun jsonParseVideos(
+        playlistId: String,
+        playlistName: String,
+        playlistThumbnail: String
+    ): List<Video> {
         val url = videosUrlFormat.format(playlistId)
         val videos = mutableListOf<Video>()
         val future = RequestFuture.newFuture<JSONObject>()
@@ -84,7 +74,8 @@ class DefaultRepository(private val application: Application) : Repository {
                 val channel = snippet["channelTitle"].toString()
                 val image = thumbnail["url"].toString()
                 val id = snippet.getJSONObject("resourceId")["videoId"].toString()
-                val video = Video(id, playlistId, title, channel, image)
+                val video =
+                    Video(id, playlistId, playlistName, playlistThumbnail, title, channel, image)
                 videos.add(video)
             }
         } catch (e: Exception) {
@@ -128,7 +119,6 @@ class DefaultRepository(private val application: Application) : Repository {
             "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=%s&maxResults=50&key=$API_KEY"
         private val playlistsUrlFormat =
             "https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=%s&maxResults=50&key=$API_KEY"
-        private lateinit var playlistsHashMap: HashMap<String, MutableList<Video>>
     }
 
 }

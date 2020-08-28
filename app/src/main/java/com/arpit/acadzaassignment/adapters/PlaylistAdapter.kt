@@ -7,11 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.arpit.acadzaassignment.Application
-import com.arpit.acadzaassignment.ui.PlaylistActivity
-import com.arpit.acadzaassignment.models.Playlist
-import com.arpit.acadzaassignment.databinding.PlaylistItemLayoutBinding
 import com.arpit.acadzaassignment.adapters.PlaylistAdapter.ViewHolder
-import java.lang.Appendable
+import com.arpit.acadzaassignment.databinding.PlaylistItemLayoutBinding
+import com.arpit.acadzaassignment.models.Playlist
+import com.arpit.acadzaassignment.ui.PlaylistActivity
 
 class PlaylistAdapter : ListAdapter<Playlist, ViewHolder>(PlaylistDiffCallback()) {
 
@@ -38,12 +37,14 @@ class PlaylistAdapter : ListAdapter<Playlist, ViewHolder>(PlaylistDiffCallback()
             binding.executePendingBindings()
             binding.root.setOnClickListener {
                 val intent = Intent(it.context, PlaylistActivity::class.java)
-                if(playlist.videos == null)
+                if (playlist.videos == null)
                     intent.putExtra("playlistId", playlist.id)
                 else {
                     intent.putExtra("playlistId", "")
                     (it.context.applicationContext as Application).playlist = playlist
                 }
+                intent.putExtra("playlistName", playlist.title)
+                intent.putExtra("playlistThumbnail", playlist.thumbnail)
                 it.context.startActivity(intent)
             }
         }

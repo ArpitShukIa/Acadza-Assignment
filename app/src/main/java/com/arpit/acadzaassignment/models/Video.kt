@@ -8,6 +8,8 @@ data class Video(
     @PrimaryKey
     val id: String,
     val playlistId: String,
+    val playlistName: String,
+    val playlistThumbnail: String,
     val title: String,
     val channel: String,
     val thumbnail: String

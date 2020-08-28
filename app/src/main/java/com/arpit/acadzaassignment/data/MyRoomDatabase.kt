@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.arpit.acadzaassignment.models.Video
 
-@Database(entities = [Video::class], version = 1, exportSchema = true)
+@Database(entities = [Video::class], version = 2, exportSchema = true)
 abstract class MyRoomDatabase : RoomDatabase() {
 
     abstract fun playlistDao(): PlaylistDao
