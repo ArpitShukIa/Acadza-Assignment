@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Acadza Assignment</string>
+    <string name="playlist_thumbnail">Playlist Thumbnail</string>
+    <string name="search">Search</string>
+    <string name="search_something">Search something…</string>
+    <string name="loading_playlists">Loading playlists…</string>
+    <string name="next_in_playlist">Next in playlist</string>
+    <string name="text_last_video">This is the last video in playlist</string>
+    <string name="viewed_playlists">Viewed Playlists</string>
+</resources>
